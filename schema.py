@@ -1,3 +1,7 @@
+# debug tools
+# import code
+# code.interact(local=dict(globals(), **locals())) 
+
 import graphene
 from graphene import relay, resolve_only_args
 from graphene_sqlalchemy import SQLAlchemyObjectType, SQLAlchemyConnectionField
@@ -124,106 +128,156 @@ class CreateTodoItem(graphene.Mutation):
             result = Success(yeah='yeah')
             return CreateTodoItem(result=result)
 
+class DeleteTodoItem(graphene.Mutation):
+    todo_item = graphene.Field(TodoItem)
+
+    class Input: 
+        id = graphene.Int(required=True)
+
+    @classmethod
+    def mutate(cls, instance, args, info, extra_args):
+        if request.method == "POST":
+            todo_item = TodoItemModel.query.get(args.get("id"))
+            todo_item.destroy()
+            return DeleteTodoItem(todo_item=todo_item)
+
+class DeleteTodoList(graphene.Mutation):
+    todo_list = graphene.Field(TodoList)
+
+    class Input:
+        id = graphene.Int(required=True)
+
+    @classmethod
+    def mutate(cls, instance, args, info, extra_args):
+        if request.method == "POST":
+            todo_list = TodoListModel.query.get(args.get("id"))
+            todo_list.destroy()
+            return DeleteTodoList(todo_list=todo_list)
+
+
 class Mutations(graphene.ObjectType):
     updateTodoList = UpdateTodoList.Field()
     createTodoList = CreateTodoList.Field()
+    deleteTodoList = DeleteTodoList.Field()
     updateTodoItem = UpdateTodoItem.Field()
     createTodoItem = CreateTodoItem.Field()
+    deleteTodoItem = DeleteTodoItem.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)
 
 '''
 {
-allTodoLists {
-    edges {
-      node {
-        id
-        name
-        todos {
-          edges {
+    allTodoLists {
+        edges {
             node {
-              id
-              name
+                id
+                name
+                todos {
+                    edges {
+                        node {
+                            id
+                            name
+                        }
+                    }
+                }
             }
-          }
         }
-      }
     }
-  }
 }
 '''
 
 ''' 
 mutation M {
     UpdateTodoList(id: 1, name: "Something Different") {
-      todoList {
-        name
-      }
+        todoList {
+            name
+        }
     }
-  }
+}
 '''
 
 '''
 mutation {
-      createTodoList(name: "Try this out") {
+    createTodoList(name: "Try this out") {
         result {
-          __typename
+            __typename
         }
-      }
     }
-'''
-
-'''
-{
-  todoList(id: 1) {
-    id
-    name
-  }
 }
 '''
 
 '''
 {
-  allTodoItems {
-    edges {
-      node {
+    todoList(id: 1) {
         id
         name
-        todoList {
-          id
-          name
-        }
-      }
     }
-  }
 }
 '''
 
 '''
 {
-  todoItem(id: 1) {
-    id
-    name
-  }
+    allTodoItems {
+        edges {
+            node {
+                id
+                name
+                todoList {
+                    id
+                    name
+                }
+            }
+        }
+    }
+}
+'''
+
+'''
+{
+    todoItem(id: 9) {
+        id
+        name
+    }
 }
 '''
 
 '''
 mutation {
-  createTodoItem(name: "new", todoListId: 1) {
-    result {
-      __typename
+    createTodoItem(name: "new", todoListId: 1) {
+        result {
+            __typename
+        }
     }
-  }
 }
 '''
 
 '''
 mutation M {
-  updateTodoItem(id: 9, name: "Something Different") {
-    todoItem {
-      name
+    updateTodoItem(id: 9, name: "Something Different") {
+        todoItem {
+            name
+        }
     }
-  }
 }
 '''
+
+'''
+mutation {
+    deleteTodoItem(id: 9) {
+        todoItem {
+            id
+            name
+        }
+    }
+}
+'''
+
+'''
+mutation {
+    deleteTodoList(id: 9) {
+        todoList {
+            id
+            name
+        }
+    }
+}

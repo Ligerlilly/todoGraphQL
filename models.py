@@ -25,6 +25,10 @@ class CRUD():
             db_session.add(self)
         return db_session.commit()
 
+    def destroy(self):
+          db_session.delete(self)
+          return db_session.commit()
+
 class TodoList(Base, CRUD):
     __tablename__ = 'todo_list'
     id = Column(Integer, primary_key=True)
