@@ -188,7 +188,7 @@ schema = graphene.Schema(query=Query, mutation=Mutations)
 
 ''' 
 mutation M {
-    UpdateTodoList(id: 1, name: "Something Different") {
+    updateTodoList(id: 1, name: "Something Different") {
         todoList {
             name
         }
@@ -281,3 +281,4 @@ mutation {
         }
     }
 }
+'''
