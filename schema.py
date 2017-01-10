@@ -134,12 +134,16 @@ class DeleteTodoItem(graphene.Mutation):
     class Input: 
         id = graphene.Int(required=True)
 
+    result = graphene.Field(TodoList)
+
     @classmethod
     def mutate(cls, instance, args, info, extra_args):
         if request.method == "POST":
             todo_item = TodoItemModel.query.get(args.get("id"))
+            todo_list_id = todo_item.todo_list_id
             todo_item.destroy()
-            return DeleteTodoItem(todo_item=todo_item)
+            result = TodoListModel.query.get(todo_list_id)
+            return DeleteTodoItem(result=result)
 
 class DeleteTodoList(graphene.Mutation):
     todo_list = graphene.Field(TodoList)
@@ -211,6 +215,14 @@ mutation {
     todoList(id: 1) {
         id
         name
+        todos {
+            edges {
+                node {
+                    id
+                    name
+                }
+            }
+        }
     }
 }
 '''
@@ -264,9 +276,8 @@ mutation M {
 '''
 mutation {
     deleteTodoItem(id: 9) {
-        todoItem {
+        result {
             id
-            name
         }
     }
 }
