@@ -6,8 +6,9 @@ import graphene
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyConnectionField
 from models import db_session, TodoList as TodoListModel, TodoItem as TodoItemModel
-from todo_list_api import TodoList, UpdateTodoList, CreateTodoList, DeleteTodoList
-from todo_item_api import TodoItem, UpdateTodoItem, CreateTodoItem, DeleteTodoItem
+from todo_list_api import TodoList
+from todo_item_api import TodoItem
+from mutations import Mutations
 
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
@@ -29,13 +30,7 @@ class Query(graphene.ObjectType):
             if tl.id == args.get("id"):
                 return tl
 
-class Mutations(graphene.ObjectType):
-    updateTodoList = UpdateTodoList.Field()
-    createTodoList = CreateTodoList.Field()
-    deleteTodoList = DeleteTodoList.Field()
-    updateTodoItem = UpdateTodoItem.Field()
-    createTodoItem = CreateTodoItem.Field()
-    deleteTodoItem = DeleteTodoItem.Field()
+
 
 schema = graphene.Schema(query=Query, mutation=Mutations)
 
