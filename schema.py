@@ -12,16 +12,20 @@ from mutations import Mutations
 
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
+
+    # TodoList
     all_todo_lists = SQLAlchemyConnectionField(TodoList)
     todo_list = graphene.Field(TodoList, id=graphene.Int())
-    all_todo_items = SQLAlchemyConnectionField(TodoItem)
-    todo_item = graphene.Field(TodoItem, id=graphene.Int())
 
     def resolve_todo_item(self, args, into, extra_args):
         todos = TodoItemModel.query.all()
         for t in todos:
             if t.id == args.get("id"):
                 return t
+
+    # TodoItem
+    all_todo_items = SQLAlchemyConnectionField(TodoItem)
+    todo_item = graphene.Field(TodoItem, id=graphene.Int())
 
     def resolve_todo_list(self, args, info, extra_args):
         todo_lists = TodoListModel.query.all()
